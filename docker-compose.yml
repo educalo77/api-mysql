@@ -1,0 +1,40 @@
+version: "3"
+services:
+  app:
+    build: .
+    init: true
+    depends_on:
+      - db
+    restart: unless-stopped
+    ports:
+      - 5000:8080
+    volumes:
+      - .:/usr/src/app/
+
+  db:
+    image: mysql:latest
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: testdbdocker
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: root
+      # You can use whatever password you like
+      MYSQL_PASSWORD: password
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - 3307:3306
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_NICE # CAP_SYS_NICE
+    expose:
+      - 3307
+    volumes:
+      - my-db:/var/lib/mysql
+
+# Names our volume
+volumes:
+  my-db:
